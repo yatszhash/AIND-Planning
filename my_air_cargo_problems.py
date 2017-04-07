@@ -1,6 +1,6 @@
 from itertools import product
 
-from aimacode.logic import PropKB
+from aimacode.logic import PropKB, FolKB
 from aimacode.planning import Action
 from aimacode.search import (
     Node, Problem,
@@ -64,10 +64,7 @@ class AirCargoProblem(Problem):
 
         def load_action(c, p, a):
             precond_pos = [expr("At({0}, {1})".format(c, a)),
-                           expr("At({0}, {1})".format(p, a)),
-                           expr("Cargo({0})".format(c)),
-                           expr("Plane({0})".format(p)),
-                           expr("Airport({0})".format(a))]
+                           expr("At({0}, {1})".format(p, a))]
             precond_neg = []
             effect_add = [expr("In({0}, {1})".format(c, p))]
             effect_rem = [expr("At({0}, {1})".format(c, a))]
@@ -84,10 +81,7 @@ class AirCargoProblem(Problem):
 
         def unload_action(c, p, a):
             precond_pos = [expr("In({0}, {1})".format(c, p)),
-                           expr("At({0}, {1})".format(p, a)),
-                           expr("Cargo({0})".format(c)),
-                           expr("Plane({0})".format(p)),
-                           expr("Airport({0})".format(a))]
+                           expr("At({0}, {1})".format(p, a))]
             precond_neg = []
             effect_add = [expr("At({0}, {1})".format(c, a))]
             effect_rem = [expr("In({0}, {1})".format(c, p))]
@@ -126,8 +120,14 @@ class AirCargoProblem(Problem):
             e.g. 'FTTTFF'
         :return: list of Action objects
         """
-        # TODO implement
-        possible_actions = []
+        kb = PropKB()
+        sentenct = decode_state(state, self.state_map).pos
+
+        kb.tell(decode_state(state, self.state_map).pos_sentence())
+        possible_actions = [action for action in self.actions_list if action.check_precond(kb, action.args)]
+        #possible_actions = [action for action in self.actions_list if all(pos in sentenct for pos in action.precond_pos)
+        #                    and all(neg not in sentenct for neg in action.precond_neg)]
+
         return possible_actions
 
     def result(self, state: str, action: Action):
