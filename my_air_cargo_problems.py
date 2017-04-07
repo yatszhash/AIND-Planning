@@ -1,3 +1,5 @@
+from itertools import product
+
 from aimacode.logic import PropKB
 from aimacode.planning import Action
 from aimacode.search import (
@@ -57,18 +59,41 @@ class AirCargoProblem(Problem):
 
             :return: list of Action objects
             '''
-            loads = []
-            # TODO create all load ground actions from the domain Load action
+            loads = [load_action(c, p, a) for c, p, a in product(self.cargos, self.planes, self.airports)]
             return loads
+
+        def load_action(c, p, a):
+            precond_pos = [expr("At({0}, {1})".format(c, a)),
+                           expr("At({0}, {1})".format(p, a)),
+                           expr("Cargo({0})".format(c)),
+                           expr("Plane({0})".format(p)),
+                           expr("Airport({0})".format(a))]
+            precond_neg = []
+            effect_add = [expr("In({0}, {1})".format(c, p))]
+            effect_rem = [expr("At({0}, {1})".format(c, a))]
+            return Action(expr("Load({0}, {1}, {2})".format(c, p, a)),
+                          [precond_pos, precond_neg], [effect_add, effect_rem])
 
         def unload_actions():
             '''Create all concrete Unload actions and return a list
 
             :return: list of Action objects
             '''
-            unloads = []
-            # TODO create all Unload ground actions from the domain Unload action
+            unloads = [unload_action(c, p, a) for c, p, a in product(self.cargos, self.planes, self.airports)]
             return unloads
+
+        def unload_action(c, p, a):
+            precond_pos = [expr("In({0}, {1})".format(c, p)),
+                           expr("At({0}, {1})".format(p, a)),
+                           expr("Cargo({0})".format(c)),
+                           expr("Plane({0})".format(p)),
+                           expr("Airport({0})".format(a))]
+            precond_neg = []
+            effect_add = [expr("At({0}, {1})".format(c, a))]
+            effect_rem = [expr("In({0}, {1})".format(c, p))]
+            load = Action(expr("Unload({0}, {1}, {2})".format(c, p, a)),
+                          [precond_pos, precond_neg], [effect_add, effect_rem])
+            return load
 
         def fly_actions():
             '''Create all concrete Fly actions and return a list
