@@ -1,3 +1,5 @@
+from itertools import product
+
 from aimacode.planning import Action
 from aimacode.search import Problem
 from aimacode.utils import expr
@@ -314,21 +316,24 @@ class PlanningGraph():
         precond_pos = [node_s.literal for node_s in self.s_levels[level] if node_s.is_pos]
         precond_neg = [node_s.literal for node_s in self.s_levels[level] if not node_s.is_pos]
 
-        self.a_levels.append(list(filter(lambda x: x is not None,
-                                           [self.possible_node_a(level, action)
-                                            for action in  self.all_actions])))
+        possible_nodes_a = list(filter(lambda x: x is not None,
+                            [self.possible_node_a(level, action)
+                            for action in self.all_actions]))
+
+        for node_a, node_s in product(possible_nodes_a, self.s_levels[level]):
+            if node_s in node_a.prenodes:
+                node_s.children.add(node_a)
+                node_a.parents.add(node_s)
+
+        self.a_levels.append(possible_nodes_a)
 
     def possible_node_a(self, level, action):
         node_a = PgNode_a(action)
 
         actual_prenodes = set(self.s_levels[level])
 
-        diff = node_a.prenodes - actual_prenodes
-
-        if diff:
+        if not node_a.prenodes.issubset(actual_prenodes):
             return None
-
-        node_a.prenodes.intersection_update(actual_prenodes)
 
         return node_a
 
@@ -341,7 +346,6 @@ class PlanningGraph():
             index for the node set lists self.a_levels[] and self.s_levels[]
 fo            adds S nodes to the current level in self.s_levels[level]
         '''
-        # TODO add literal S level to the planning graph as described in the Russell-Norvig text
         # 1. determine what literals to add
         # 2. connect the nodes
         # for example, every A node in the previous level has a list of S nodes in effnodes that represent the effect
