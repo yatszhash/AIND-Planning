@@ -193,8 +193,11 @@ class AirCargoProblem(Problem):
         '''
         # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
         count = 0
-        return count
+        current_pos = decode_state(node.state, self.state_map).pos
 
+        count = len([True for condition in self.goal if condition not in current_pos])
+
+        return count
 
 def air_cargo_p1() -> AirCargoProblem:
     cargos = ['C1', 'C2']
