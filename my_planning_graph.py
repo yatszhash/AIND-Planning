@@ -536,7 +536,8 @@ fo            adds S nodes to the current level in self.s_levels[level]
         :return: bool
         '''
         # TODO test for Inconsistent Support between nodes
-        return False
+
+        return all(node_a1.is_mutex(node_a2) for node_a1, node_a2 in product(node_s1.parents, node_s2.parents))
 
     def h_levelsum(self) -> int:
         '''The sum of the level costs of the individual goals (admissible if goals independent)
