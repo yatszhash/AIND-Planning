@@ -428,7 +428,6 @@ fo            adds S nodes to the current level in self.s_levels[level]
         :param node_a2: PgNode_a
         :return: bool
         '''
-        # TODO test for Inconsistent Effects between nodes
         if not set(node_a1.action.effect_rem).isdisjoint(set(node_a2.action.effect_add)):
             return True
 
@@ -451,7 +450,18 @@ fo            adds S nodes to the current level in self.s_levels[level]
         :param node_a2: PgNode_a
         :return: bool
         '''
-        # TODO test for Interference between nodes
+        if not set(node_a1.action.effect_add).isdisjoint(set(node_a2.action.precond_neg)):
+            return True
+
+        if not set(node_a1.action.effect_rem).isdisjoint(set(node_a2.action.precond_pos)):
+            return True
+
+        if not set(node_a2.action.effect_add).isdisjoint(set(node_a1.action.precond_neg)):
+            return True
+
+        if not set(node_a2.action.effect_rem).isdisjoint(set(node_a1.action.precond_pos)):
+            return True
+
         return False
 
     def competing_needs_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
