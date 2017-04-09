@@ -535,8 +535,6 @@ fo            adds S nodes to the current level in self.s_levels[level]
         :param node_s2: PgNode_s
         :return: bool
         '''
-        # TODO test for Inconsistent Support between nodes
-
         return all(node_a1.is_mutex(node_a2) for node_a1, node_a2 in product(node_s1.parents, node_s2.parents))
 
     def h_levelsum(self) -> int:
@@ -547,4 +545,12 @@ fo            adds S nodes to the current level in self.s_levels[level]
         level_sum = 0
         # TODO implement
         # for each goal in the problem, determine the level cost, then add them together
+
+        for fluent in self.problem.goal:
+            goal_s = PgNode_s(fluent, True)
+            for level, nodes_s in enumerate(self.s_levels):
+                if goal_s in nodes_s:
+                    level_sum += level
+                    break
+
         return level_sum
