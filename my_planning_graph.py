@@ -313,9 +313,6 @@ class PlanningGraph():
         #   set iff all prerequisite literals for the action hold in S0.  This can be accomplished by testing
         #   to see if a proposed PgNode_a has prenodes that are a subset of the previous S level.  Once an
         #   action node is added, it MUST be connected to the S node instances in the appropriate s_level set.
-        precond_pos = [node_s.literal for node_s in self.s_levels[level] if node_s.is_pos]
-        precond_neg = [node_s.literal for node_s in self.s_levels[level] if not node_s.is_pos]
-
         possible_nodes_a = list(filter(lambda x: x is not None,
                             [self.possible_node_a(level, action)
                             for action in self.all_actions]))
@@ -476,6 +473,16 @@ fo            adds S nodes to the current level in self.s_levels[level]
         '''
 
         # TODO test for Competing Needs between nodes
+        if not set(node_a1.action.precond_pos).isdisjoint(set(node_a2.action.precond_neg)):
+            return True
+
+        if not set(node_a2.action.precond_pos).isdisjoint(set(node_a1.action.precond_neg)):
+            return True
+
+        for a1_parent, a2_parent in product(node_a1.parents, node_a2.parents):
+            if a1_parent.is_mutex(a2_parent):
+                return True
+
         return False
 
     def update_s_mutex(self, nodeset: set):
