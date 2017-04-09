@@ -429,6 +429,12 @@ fo            adds S nodes to the current level in self.s_levels[level]
         :return: bool
         '''
         # TODO test for Inconsistent Effects between nodes
+        if not set(node_a1.action.effect_rem).isdisjoint(set(node_a2.action.effect_add)):
+            return True
+
+        if not set(node_a2.action.effect_rem).isdisjoint(set(node_a1.action.effect_add)):
+            return True
+
         return False
 
     def interference_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
