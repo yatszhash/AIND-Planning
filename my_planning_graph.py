@@ -543,7 +543,6 @@ fo            adds S nodes to the current level in self.s_levels[level]
         :return: int
         '''
         level_sum = 0
-        # TODO implement
         # for each goal in the problem, determine the level cost, then add them together
 
         for fluent in self.problem.goal:

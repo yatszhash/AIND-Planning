@@ -62,7 +62,13 @@ def run_search(problem, search_function, parameter=None):
     print("{}\n".format(ip))
     show_solution(node, end - start)
     print()
+    return 1
 
+def show(ip, node, elapsed):
+    print("\nExpansions   Goal Tests   New Nodes")
+    print("{}\n".format(ip))
+    show_solution(node, elapsed)
+    print()
 
 def manual():
 
